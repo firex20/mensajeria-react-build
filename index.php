@@ -43,8 +43,7 @@
             break;
         case "borrarmensaje":
             $id=$datos["id"];
-            $user=$datos["user"];
-            $exito=$usuarioDB->borrarMensaje($id, $user);
+            $exito=$usuarioDB->borrarMensaje($id);
             $json = array("exito" => $exito);
             echo json_encode($json);
             break;

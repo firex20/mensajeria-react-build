@@ -44,20 +44,9 @@
             $resultado = $this->conexion->query($sql);
             $tupla = $resultado->fetch_assoc();
             while ($tupla != null) {
-                if ($tupla["remitente"] == $login && ($tupla["estado"] == 3 || $tupla["estado"] == 2)) {
-                    $mensaje = new Mensaje($tupla);
-                    $usuario->getBuzon()->addMensaje($mensaje);
-                    $tupla = $resultado->fetch_assoc();
-                } elseif ($tupla["destinatario"] == $login && ($tupla["estado"] == 3 || $tupla["estado"] == 1)) {
-                    $mensaje = new Mensaje($tupla);
-                    $usuario->getBuzon()->addMensaje($mensaje);
-                    $tupla = $resultado->fetch_assoc();
-                } elseif ($tupla["estado"] == 0){
-                    $this->borrarMensaje($tupla["id"]);
-                    $tupla = $resultado->fetch_assoc();
-                } else {
-                    $tupla = $resultado->fetch_assoc();
-                }
+                $mensaje = new Mensaje($tupla);
+                $usuario->getBuzon()->addMensaje($mensaje);
+                $tupla = $resultado->fetch_assoc();
             }
         }
 
@@ -90,30 +79,12 @@
             return $exito;
         }
 
-        public function borrarMensaje($id, $user) {
-            $sql_check = "select estado, remitente, destinatario from mensajes where id = '$id'";
-            $check = $this->conexion->query($sql_check);
-            $check_result = $check->fetch_assoc();
-            $status = $check_result["estado"];
+        public function borrarMensaje($id) {
+            
+            $sql = "delete from mensajes where id='$id'";
+            $exito = $this->conexion->query($sql);
+            return $exito;
 
-            if ($check_result["remitente"] == $user) {
-                $status = $status - 2;
-            } elseif ($check_result["destinatario"] == $user) {
-                $status = $status - 1;
-            } else {
-                $exito=false;
-                return $exito;
-            }
-
-            if ($status != 0) {
-                $sql_cstatus = "update mensajes set estado = $status where id = '$id'";
-                $exito = $this->conexion->query($sql_cstatus);
-                return $exito;
-            } else {
-                $sql = "delete from mensajes where id='$id'";
-                $exito = $this->conexion->query($sql);
-                return $exito;
-            }
         }
 
         public function cerrar() {
